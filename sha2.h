@@ -69,6 +69,8 @@ typedef struct {
     uint64 h[8];
 } sha512_ctx;
 
+char CHECK_SUM_BUFFER[2 * SHA512_DIGEST_SIZE + 1];
+
 typedef sha512_ctx sha384_ctx;
 typedef sha256_ctx sha224_ctx;
 
@@ -78,6 +80,7 @@ void sha224_update(sha224_ctx *ctx, const unsigned char *message,
 void sha224_final(sha224_ctx *ctx, unsigned char *digest);
 void sha224(const unsigned char *message, unsigned int len,
             unsigned char *digest);
+void sha224_file(const unsigned char *file_name, unsigned char *digest);
 
 void sha256_init(sha256_ctx * ctx);
 void sha256_update(sha256_ctx *ctx, const unsigned char *message,
@@ -85,6 +88,7 @@ void sha256_update(sha256_ctx *ctx, const unsigned char *message,
 void sha256_final(sha256_ctx *ctx, unsigned char *digest);
 void sha256(const unsigned char *message, unsigned int len,
             unsigned char *digest);
+void sha256_file(const unsigned char *file_name, unsigned char *digest);
 
 void sha384_init(sha384_ctx *ctx);
 void sha384_update(sha384_ctx *ctx, const unsigned char *message,
@@ -92,6 +96,7 @@ void sha384_update(sha384_ctx *ctx, const unsigned char *message,
 void sha384_final(sha384_ctx *ctx, unsigned char *digest);
 void sha384(const unsigned char *message, unsigned int len,
             unsigned char *digest);
+void sha384_file(const unsigned char *file_name, unsigned char *digest);
 
 void sha512_init(sha512_ctx *ctx);
 void sha512_update(sha512_ctx *ctx, const unsigned char *message,
@@ -99,6 +104,11 @@ void sha512_update(sha512_ctx *ctx, const unsigned char *message,
 void sha512_final(sha512_ctx *ctx, unsigned char *digest);
 void sha512(const unsigned char *message, unsigned int len,
             unsigned char *digest);
+void sha512_file(const unsigned char *file_name, unsigned char *digest);
+
+void print_check_sum(unsigned char *digest, unsigned int digest_size);
+
+void get_check_sum(unsigned char *check_sum_buffer, unsigned char *digest, unsigned int digest_size);
 
 #ifdef __cplusplus
 }

@@ -35,6 +35,8 @@
 #define UNROLL_LOOPS /* Enable loops unrolling */
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "sha2.h"
@@ -324,6 +326,28 @@ void sha256_transf(sha256_ctx *ctx, const unsigned char *message,
     }
 }
 
+void sha256_file(const unsigned char *file_name, unsigned char *digest)
+{
+    FILE *fp = fopen(file_name, "r");
+    if (fp == NULL)
+        printf("Error: can not open file %s\n", file_name);
+    int len = 4096;
+    char message[len];
+    sha256_ctx ctx;
+    sha256_init(&ctx);
+    while (1)
+    {
+        int tmp_len = fread(message, 1, len, fp);
+        sha256_update(&ctx, message, tmp_len);
+        if (feof(fp))
+        {
+            sha256_final(&ctx, digest);
+            break;
+        }
+    }
+    fclose(fp);
+}
+
 void sha256(const unsigned char *message, unsigned int len, unsigned char *digest)
 {
     sha256_ctx ctx;
@@ -520,6 +544,28 @@ void sha512_transf(sha512_ctx *ctx, const unsigned char *message,
     }
 }
 
+void sha512_file(const unsigned char *file_name, unsigned char *digest)
+{
+    FILE *fp = fopen(file_name, "r");
+    if (fp == NULL)
+        printf("Error: can not open file %s\n", file_name);
+    int len = 4096;
+    char message[len];
+    sha512_ctx ctx;
+    sha512_init(&ctx);
+    while (1)
+    {
+        int tmp_len = fread(message, 1, len, fp);
+        sha512_update(&ctx, message, tmp_len);
+        if (feof(fp))
+        {
+            sha512_final(&ctx, digest);
+            break;
+        }
+    }
+    fclose(fp);
+}
+
 void sha512(const unsigned char *message, unsigned int len,
             unsigned char *digest)
 {
@@ -622,6 +668,28 @@ void sha512_final(sha512_ctx *ctx, unsigned char *digest)
 
 /* SHA-384 functions */
 
+void sha384_file(const unsigned char *file_name, unsigned char *digest)
+{
+    FILE *fp = fopen(file_name, "r");
+    if (fp == NULL)
+        printf("Error: can not open file %s\n", file_name);
+    int len = 4096;
+    char message[len];
+    sha384_ctx ctx;
+    sha384_init(&ctx);
+    while (1)
+    {
+        int tmp_len = fread(message, 1, len, fp);
+        sha384_update(&ctx, message, tmp_len - 1);
+        if (feof(fp))
+        {
+            sha384_final(&ctx, digest);
+            break;
+        }
+    }
+    fclose(fp);
+}
+
 void sha384(const unsigned char *message, unsigned int len,
             unsigned char *digest)
 {
@@ -722,6 +790,28 @@ void sha384_final(sha384_ctx *ctx, unsigned char *digest)
 
 /* SHA-224 functions */
 
+void sha224_file(const unsigned char *file_name, unsigned char *digest)
+{
+    FILE *fp = fopen(file_name, "r");
+    if (fp == NULL)
+        printf("Error: can not open file %s\n", file_name);
+    int len = 4096;
+    char message[len];
+    sha224_ctx ctx;
+    sha224_init(&ctx);
+    while (1)
+    {
+        int tmp_len = fread(message, 1, len, fp);
+        sha224_update(&ctx, message, tmp_len);
+        if (feof(fp))
+        {
+            sha224_final(&ctx, digest);
+            break;
+        }
+    }
+    fclose(fp);
+}
+
 void sha224(const unsigned char *message, unsigned int len,
             unsigned char *digest)
 {
@@ -821,12 +911,23 @@ void sha224_final(sha224_ctx *ctx, unsigned char *digest)
 #endif /* !UNROLL_LOOPS */
 }
 
+void print_check_sum(unsigned char *digest, unsigned int digest_size)
+{
+    get_check_sum(CHECK_SUM_BUFFER, digest, digest_size);
+    printf("sha%d: %s\n", digest_size*8, CHECK_SUM_BUFFER);
+}
+
+void get_check_sum(unsigned char *check_sum_buffer, unsigned char *digest, unsigned int digest_size)
+{
+    int i;
+    CHECK_SUM_BUFFER[2 * digest_size] = '\0';
+    for (i = 0; i < (int) digest_size; i ++)
+        sprintf(CHECK_SUM_BUFFER  + 2 * i, "%02x", digest[i]);
+}
+
 #ifdef TEST_VECTORS
 
 /* FIPS 180-2 Validation tests */
-
-#include <stdio.h>
-#include <stdlib.h>
 
 void test(const char *vector, unsigned char *digest,
           unsigned int digest_size)
@@ -845,6 +946,15 @@ void test(const char *vector, unsigned char *digest,
         fprintf(stderr, "Test failed.\n");
         exit(EXIT_FAILURE);
     }
+}
+
+void get_file(const unsigned char *message, unsigned int len, const unsigned char *file_name)
+{
+    FILE *fp = fopen(file_name, "w");
+    if (fp == NULL)
+        printf("Error: can not open file %s\n", file_name);
+    fwrite(message, 1, len, fp);
+    fclose(fp);
 }
 
 int main(void)
@@ -902,42 +1012,92 @@ int main(void)
     printf("SHA-2 FIPS 180-2 Validation tests\n\n");
     printf("SHA-224 Test vectors\n");
 
+    get_file(message1, strlen(message1), "test1.txt");
+    get_file(message2a, strlen(message2a), "test2a.txt");
+    get_file(message2b, strlen(message2b), "test2b.txt");
+    get_file(message3, message3_len, "test3.txt");
+
     sha224((const unsigned char *) message1, strlen(message1), digest);
-    test(vectors[0][0], digest, SHA224_DIGEST_SIZE);
+    // test(vectors[0][0], digest, SHA224_DIGEST_SIZE);
+    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    sha224_file("test1.txt", digest);
+    print_check_sum(digest, SHA224_DIGEST_SIZE);
+
     sha224((const unsigned char *) message2a, strlen(message2a), digest);
-    test(vectors[0][1], digest, SHA224_DIGEST_SIZE);
+    // test(vectors[0][1], digest, SHA224_DIGEST_SIZE);
+    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    sha224_file("test2a.txt", digest);
+    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    
     sha224(message3, message3_len, digest);
-    test(vectors[0][2], digest, SHA224_DIGEST_SIZE);
+    // test(vectors[0][2], digest, SHA224_DIGEST_SIZE);
+    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    sha224_file("test3.txt", digest);
+    print_check_sum(digest, SHA224_DIGEST_SIZE);
     printf("\n");
 
     printf("SHA-256 Test vectors\n");
 
     sha256((const unsigned char *) message1, strlen(message1), digest);
-    test(vectors[1][0], digest, SHA256_DIGEST_SIZE);
+    // test(vectors[1][0], digest, SHA256_DIGEST_SIZE);
+    print_check_sum(digest, SHA256_DIGEST_SIZE);
+    sha256_file("test1.txt", digest);
+    print_check_sum(digest, SHA256_DIGEST_SIZE);
+
     sha256((const unsigned char *) message2a, strlen(message2a), digest);
-    test(vectors[1][1], digest, SHA256_DIGEST_SIZE);
+    // test(vectors[1][1], digest, SHA256_DIGEST_SIZE);
+    print_check_sum(digest, SHA256_DIGEST_SIZE);
+    sha256_file("test2a.txt", digest);
+    print_check_sum(digest, SHA256_DIGEST_SIZE);
+
     sha256(message3, message3_len, digest);
-    test(vectors[1][2], digest, SHA256_DIGEST_SIZE);
+    // test(vectors[1][2], digest, SHA256_DIGEST_SIZE);
+    print_check_sum(digest, SHA256_DIGEST_SIZE);
+    sha256_file("test3.txt", digest);
+    print_check_sum(digest, SHA256_DIGEST_SIZE);
+
     printf("\n");
 
     printf("SHA-384 Test vectors\n");
 
     sha384((const unsigned char *) message1, strlen(message1), digest);
-    test(vectors[2][0], digest, SHA384_DIGEST_SIZE);
+    // test(vectors[2][0], digest, SHA384_DIGEST_SIZE);
+    print_check_sum(digest, SHA384_DIGEST_SIZE);
+    sha256_file("test1.txt", digest);
+    print_check_sum(digest, SHA384_DIGEST_SIZE);
+
     sha384((const unsigned char *)message2b, strlen(message2b), digest);
-    test(vectors[2][1], digest, SHA384_DIGEST_SIZE);
+    // test(vectors[2][1], digest, SHA384_DIGEST_SIZE);
+    print_check_sum(digest, SHA384_DIGEST_SIZE);
+    sha256_file("test2b.txt", digest);
+    print_check_sum(digest, SHA384_DIGEST_SIZE);
+
     sha384(message3, message3_len, digest);
-    test(vectors[2][2], digest, SHA384_DIGEST_SIZE);
+    // test(vectors[2][2], digest, SHA384_DIGEST_SIZE);
+    print_check_sum(digest, SHA384_DIGEST_SIZE);
+    sha256_file("test3.txt", digest);
+    print_check_sum(digest, SHA384_DIGEST_SIZE);
     printf("\n");
 
     printf("SHA-512 Test vectors\n");
 
     sha512((const unsigned char *) message1, strlen(message1), digest);
-    test(vectors[3][0], digest, SHA512_DIGEST_SIZE);
+    // test(vectors[3][0], digest, SHA512_DIGEST_SIZE);
+    print_check_sum(digest, SHA512_DIGEST_SIZE);
+    sha256_file("test1.txt", digest);
+    print_check_sum(digest, SHA512_DIGEST_SIZE);
+
     sha512((const unsigned char *) message2b, strlen(message2b), digest);
-    test(vectors[3][1], digest, SHA512_DIGEST_SIZE);
+    // test(vectors[3][1], digest, SHA512_DIGEST_SIZE);
+    print_check_sum(digest, SHA512_DIGEST_SIZE);
+    sha256_file("test2b.txt", digest);
+    print_check_sum(digest, SHA512_DIGEST_SIZE);
+
     sha512(message3, message3_len, digest);
-    test(vectors[3][2], digest, SHA512_DIGEST_SIZE);
+    // test(vectors[3][2], digest, SHA512_DIGEST_SIZE);
+    print_check_sum(digest, SHA512_DIGEST_SIZE);
+    sha256_file("test3.txt", digest);
+    print_check_sum(digest, SHA512_DIGEST_SIZE);
     printf("\n");
 
     printf("All tests passed.\n");
