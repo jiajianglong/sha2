@@ -913,6 +913,14 @@ void sha224_final(sha224_ctx *ctx, unsigned char *digest)
 
 void print_check_sum(unsigned char *digest, unsigned int digest_size)
 {
+    int i;
+    for (i = 0; i < (int) digest_size; i++)
+        printf("%02x", digest[i]);
+    printf("\n");
+}
+
+void _print_check_sum(unsigned char *digest, unsigned int digest_size)
+{
     get_check_sum(CHECK_SUM_BUFFER, digest, digest_size);
     printf("sha%d: %s\n", digest_size*8, CHECK_SUM_BUFFER);
 }
