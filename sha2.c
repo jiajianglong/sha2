@@ -933,6 +933,15 @@ void get_check_sum(unsigned char *check_sum_buffer, unsigned char *digest, unsig
         sprintf(CHECK_SUM_BUFFER  + 2 * i, "%02x", digest[i]);
 }
 
+void get_file(const unsigned char *message, unsigned int len, const unsigned char *file_name)
+{
+    FILE *fp = fopen(file_name, "w");
+    if (fp == NULL)
+        printf("Error: can not open file %s\n", file_name);
+    fwrite(message, 1, len, fp);
+    fclose(fp);
+}
+
 #ifdef TEST_VECTORS
 
 /* FIPS 180-2 Validation tests */
@@ -954,15 +963,6 @@ void test(const char *vector, unsigned char *digest,
         fprintf(stderr, "Test failed.\n");
         exit(EXIT_FAILURE);
     }
-}
-
-void get_file(const unsigned char *message, unsigned int len, const unsigned char *file_name)
-{
-    FILE *fp = fopen(file_name, "w");
-    if (fp == NULL)
-        printf("Error: can not open file %s\n", file_name);
-    fwrite(message, 1, len, fp);
-    fclose(fp);
 }
 
 int main(void)
