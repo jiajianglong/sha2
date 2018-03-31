@@ -1,4 +1,4 @@
-//*
+/*
  * FIPS 180-2 SHA-224/256/384/512 implementation
  * Last update: 02/02/2007
  * Issue date:  04/30/2005
@@ -56,6 +56,8 @@
 #define SHA512_F2(x) (ROTR(x, 14) ^ ROTR(x, 18) ^ ROTR(x, 41))
 #define SHA512_F3(x) (ROTR(x,  1) ^ ROTR(x,  8) ^ SHFR(x,  7))
 #define SHA512_F4(x) (ROTR(x, 19) ^ ROTR(x, 61) ^ SHFR(x,  6))
+
+char CHECK_SUM_BUFFER[2 * SHA512_DIGEST_SIZE + 1];
 
 #define UNPACK32(x, str)                      \
 {                                             \

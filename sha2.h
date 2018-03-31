@@ -69,7 +69,7 @@ typedef struct {
     uint64 h[8];
 } sha512_ctx;
 
-char CHECK_SUM_BUFFER[2 * SHA512_DIGEST_SIZE + 1];
+extern char CHECK_SUM_BUFFER[2 * SHA512_DIGEST_SIZE + 1];
 
 typedef sha512_ctx sha384_ctx;
 typedef sha256_ctx sha224_ctx;

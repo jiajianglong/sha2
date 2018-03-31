@@ -48,7 +48,7 @@ int main(void)
     unsigned int message3_len = 1000000;
     unsigned char digest[SHA512_DIGEST_SIZE];
 
-    message3 = malloc(message3_len);
+    message3 = (unsigned char *)malloc(message3_len);
     if (message3 == NULL) {
         fprintf(stderr, "Can't allocate memory\n");
         return -1;
@@ -58,49 +58,49 @@ int main(void)
     printf("SHA-2 FIPS 180-2 Validation tests\n\n");
     printf("SHA-224 Test vectors\n");
 
-    get_file(message1, strlen(message1), "test1.txt");
-    get_file(message2a, strlen(message2a), "test2a.txt");
-    get_file(message2b, strlen(message2b), "test2b.txt");
+    get_file((unsigned char *)message1, (unsigned int)strlen(message1), "test1.txt");
+    get_file((unsigned char *)message2a, (unsigned int)strlen(message2a), "test2a.txt");
+    get_file((unsigned char *)message2b, (unsigned int)strlen(message2b), "test2b.txt");
     get_file(message3, message3_len, "test3.txt");
 
     sha224((const unsigned char *) message1, strlen(message1), digest);
     // test(vectors[0][0], digest, SHA224_DIGEST_SIZE);
-    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    print_check(digest, SHA224_DIGEST_SIZE);
     sha224_file("test1.txt", digest);
-    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    print_check(digest, SHA224_DIGEST_SIZE);
 
     sha224((const unsigned char *) message2a, strlen(message2a), digest);
     // test(vectors[0][1], digest, SHA224_DIGEST_SIZE);
-    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    print_check(digest, SHA224_DIGEST_SIZE);
     sha224_file("test2a.txt", digest);
-    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    print_check(digest, SHA224_DIGEST_SIZE);
     
     sha224(message3, message3_len, digest);
     // test(vectors[0][2], digest, SHA224_DIGEST_SIZE);
-    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    print_check(digest, SHA224_DIGEST_SIZE);
     sha224_file("test3.txt", digest);
-    print_check_sum(digest, SHA224_DIGEST_SIZE);
+    print_check(digest, SHA224_DIGEST_SIZE);
     printf("\n");
 
     printf("SHA-256 Test vectors\n");
 
     sha256((const unsigned char *) message1, strlen(message1), digest);
     // test(vectors[1][0], digest, SHA256_DIGEST_SIZE);
-    print_check_sum(digest, SHA256_DIGEST_SIZE);
+    print_check(digest, SHA256_DIGEST_SIZE);
     sha256_file("test1.txt", digest);
-    print_check_sum(digest, SHA256_DIGEST_SIZE);
+    print_check(digest, SHA256_DIGEST_SIZE);
 
     sha256((const unsigned char *) message2a, strlen(message2a), digest);
     // test(vectors[1][1], digest, SHA256_DIGEST_SIZE);
-    print_check_sum(digest, SHA256_DIGEST_SIZE);
+    print_check(digest, SHA256_DIGEST_SIZE);
     sha256_file("test2a.txt", digest);
-    print_check_sum(digest, SHA256_DIGEST_SIZE);
+    print_check(digest, SHA256_DIGEST_SIZE);
 
     sha256(message3, message3_len, digest);
     // test(vectors[1][2], digest, SHA256_DIGEST_SIZE);
-    print_check_sum(digest, SHA256_DIGEST_SIZE);
+    print_check(digest, SHA256_DIGEST_SIZE);
     sha256_file("test3.txt", digest);
-    print_check_sum(digest, SHA256_DIGEST_SIZE);
+    print_check(digest, SHA256_DIGEST_SIZE);
 
     printf("\n");
 
@@ -108,42 +108,42 @@ int main(void)
 
     sha384((const unsigned char *) message1, strlen(message1), digest);
     // test(vectors[2][0], digest, SHA384_DIGEST_SIZE);
-    print_check_sum(digest, SHA384_DIGEST_SIZE);
+    print_check(digest, SHA384_DIGEST_SIZE);
     sha256_file("test1.txt", digest);
-    print_check_sum(digest, SHA384_DIGEST_SIZE);
+    print_check(digest, SHA384_DIGEST_SIZE);
 
     sha384((const unsigned char *)message2b, strlen(message2b), digest);
     // test(vectors[2][1], digest, SHA384_DIGEST_SIZE);
-    print_check_sum(digest, SHA384_DIGEST_SIZE);
+    print_check(digest, SHA384_DIGEST_SIZE);
     sha256_file("test2b.txt", digest);
-    print_check_sum(digest, SHA384_DIGEST_SIZE);
+    print_check(digest, SHA384_DIGEST_SIZE);
 
     sha384(message3, message3_len, digest);
     // test(vectors[2][2], digest, SHA384_DIGEST_SIZE);
-    print_check_sum(digest, SHA384_DIGEST_SIZE);
+    print_check(digest, SHA384_DIGEST_SIZE);
     sha256_file("test3.txt", digest);
-    print_check_sum(digest, SHA384_DIGEST_SIZE);
+    print_check(digest, SHA384_DIGEST_SIZE);
     printf("\n");
 
     printf("SHA-512 Test vectors\n");
 
     sha512((const unsigned char *) message1, strlen(message1), digest);
     // test(vectors[3][0], digest, SHA512_DIGEST_SIZE);
-    print_check_sum(digest, SHA512_DIGEST_SIZE);
+    print_check(digest, SHA512_DIGEST_SIZE);
     sha256_file("test1.txt", digest);
-    print_check_sum(digest, SHA512_DIGEST_SIZE);
+    print_check(digest, SHA512_DIGEST_SIZE);
 
     sha512((const unsigned char *) message2b, strlen(message2b), digest);
     // test(vectors[3][1], digest, SHA512_DIGEST_SIZE);
-    print_check_sum(digest, SHA512_DIGEST_SIZE);
+    print_check(digest, SHA512_DIGEST_SIZE);
     sha256_file("test2b.txt", digest);
-    print_check_sum(digest, SHA512_DIGEST_SIZE);
+    print_check(digest, SHA512_DIGEST_SIZE);
 
     sha512(message3, message3_len, digest);
     // test(vectors[3][2], digest, SHA512_DIGEST_SIZE);
-    print_check_sum(digest, SHA512_DIGEST_SIZE);
+    print_check(digest, SHA512_DIGEST_SIZE);
     sha256_file("test3.txt", digest);
-    print_check_sum(digest, SHA512_DIGEST_SIZE);
+    print_check(digest, SHA512_DIGEST_SIZE);
     printf("\n");
 
     printf("All tests passed.\n");
